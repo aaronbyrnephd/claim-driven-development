@@ -24,12 +24,12 @@ loop terminates (reaches step 6, Accept) when every claim has a verdict:
 
 ```mermaid
 flowchart TD
-    N1["1. State claims<br/>define the claim set"] --> N2["2. Implement or generate<br/>code"]
-    N2 --> N3["3. Verify<br/>adjudicate each claim"]
-    N3 -->|a claim is falsified| N4["4. Diagnose<br/>determine the cause"]
+    N1["1. State claims <br/> define the claim set"] --> N2["2. Implement or generate <br/> code"]
+    N2 --> N3["3. Verify <br/> adjudicate each claim"]
+    N3 -->|a claim is falsified| N4["4. Diagnose <br/> determine the cause"]
     N4 -->|implementation is wrong: bug| N2
-    N4 -->|claim is wrong: a genuine discovery| N5["5. Retain as new knowledge<br/>about your system"]
-    N3 -->|all claims adjudicated| N6["6. Accept<br/>claim set is complete"]
+    N4 -->|claim is wrong: a genuine discovery| N5["5. Retain as new knowledge <br/> about your system"]
+    N3 -->|all claims adjudicated| N6["6. Accept <br/> claim set is complete"]
     N5 --> N6
     N6 -.->|future change, same claim set| N2
 ```
