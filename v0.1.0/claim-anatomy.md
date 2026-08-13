@@ -32,10 +32,10 @@ flowchart LR
     C[conjectured] --> V{checked}
     V -->|true on every trial| H["holds (n=...)"]
     V -->|derived proof| P["proven"]
-    V -->|false on some trial| F["falsified<br/>counterexample kept"]
+    V -->|false on some trial| F["falsified <br/> counterexample kept"]
     V -->|not evaluable| S[skipped]
-    F -->|diagnosis: implementation was wrong| R["re-implement<br/>cdd.md loop, step 2"] --> V
-    F -->|diagnosis: claim was wrong| K["retained as new knowledge<br/>cdd.md loop, step 5"]
+    F -->|diagnosis: implementation was wrong| R["re-implement <br/> cdd.md loop, step 2"] --> V
+    F -->|diagnosis: claim was wrong| K["retained as new knowledge <br/> cdd.md loop, step 5"]
 ```
 
 `skipped` covers a claim that can't be checked at all: the code has effects
