@@ -1,12 +1,45 @@
 # Record schema
 
-Status: v0.2.0-draft. This is the interoperability contract: any two tools that
-read and write YAML in this shape can work with each other's records
-without depending on each other's code. The shape splits into two files,
+Status: v0.2.0-draft. The shape splits into two files,
 [`declared-schema.md`](declared-schema.md) (how a claim set is proposed)
 and [`verified-schema.md`](verified-schema.md) (what a conformant tool
 writes after checking one). This document covers what's true of both, or
 true of the relationship between them.
+
+## What this document requires, and what it leaves alone
+
+This specification describes a method. It is deliberately broader than
+any one implementation, and it is not a schema a tool validates against
+field by field.
+
+What it pins is a **small normative core**: the handful of things two
+tools must agree on to read each other's records at all. Everything
+outside that core is implementation-defined, and a tool that carries more
+than the core, differently named or differently arranged, is conformant
+so long as the core is present and correct.
+
+**The normative core.** A verified record MUST carry, under these names:
+
+| | |
+|---|---|
+| `claims` | the list of claims, each with `name`, `statement`, `verdict`, `route`, `authored` |
+| `grammar` | which expression dialect the statements are written in, at function level or per claim |
+| `identity` | with at least `form` and `sig` |
+| `lineage` | with at least the spec version the record conforms to |
+
+That is the whole of it. A conformance suite tests that, and nothing
+beyond it.
+
+**Everything else is implementation-defined**, including: every other
+field named anywhere in this specification, how a tool arranges what it
+knows, what it puts under `meta` or beside the core, what it stores about
+dependencies, concepts, references, symbolic forms, or its own analysis,
+and where and how it persists any of it.
+
+Fields named in the rest of these documents are **recommended spellings
+for facts a tool may well want to record**, not a checklist. Where one is
+described below, take it as "if you record this fact, here is the name
+and meaning other tools will expect", not as "you must record it".
 
 ## Declared vs verified
 
@@ -21,41 +54,154 @@ produce. Nothing downstream, a reader, a CI gate, an AI agent, another tool, sho
 trust the declared shape for anything beyond what claims someone intended
 to check.
 
-**A verified record stands on its own.** `statement`, `route`, `domain`,
-`tolerance`, `grammar`, `meta`, everything needed to read and re-check a
-claim, is carried forward into the verified shape rather than left behind
-in the declared one. A reader, or another tool, should never need to go
-find whatever declared file originally proposed a claim just to understand
-the verified record in front of them; the declared shape is genuinely
-intermediary, disposable once it's been checked, not a second source of
-truth the verified record quietly depends on.
+**A verified record stands on its own.** Everything needed to read and
+re-check a claim is carried forward into the verified shape rather than
+left behind in the declared one: at minimum the statement, the grammar it
+is written in, the route and tolerance that shaped how it was checked,
+and the domain that scoped it. A reader, or another tool, should never
+need to go find whatever declared file originally proposed a claim just
+to understand the verified record in front of them; the declared shape is
+genuinely intermediary, disposable once it's been checked, not a second
+source of truth the verified record quietly depends on.
+
+This is a principle, not a field list. A tool that carries the same
+information under different names still satisfies it; a tool whose
+records only make sense with the declared file open does not.
 
 The examples in `declared-schema.md` and `verified-schema.md` are
 illustrative of the shape, not a literal dump from any one tool.
 
 ## Field alignment
 
-Every field, which shape(s) it appears in, and what changes crossing from
-declared to verified:
+For the fields this specification names, which shape(s) they appear in,
+and what changes crossing from declared to verified. Only the rows marked
+**core** are required; the rest are recommended spellings.
 
 | field | declared | verified | notes |
 |---|---|---|---|
-| `name` | claim name, required | carried forward unchanged | — |
-| `statement` | required | required, carried forward unchanged | same field name in both shapes, not renamed in transit; see "Canonical form" below |
-| `route` | optional, default `probe` | carried forward, and names the mechanism that actually decided | so a verified record is self-contained, see "Open for extension" below |
-| `verdict` | doesn't exist | required | verified-only, a declared claim hasn't been checked yet |
+| `name` | claim name, required | carried forward unchanged | **core** |
+| `statement` | required | required, carried forward unchanged | **core**; same field name in both shapes, not renamed in transit |
+| `route` | optional, default `probe` | required, and names the mechanism that actually decided | **core**; see "Open for extension" below |
+| `verdict` | doesn't exist | required | **core**; a declared claim hasn't been checked yet |
+| `authored` | doesn't exist | required, stamped by the checking tool | **core**; see `verified-schema.md` |
+| `grammar` | recommended, function-level or per-claim | carried forward | **core**; needed to read `statement` at all |
+| `identity` | doesn't exist | required | **core**, with at least `form` and `sig`; nothing to hash before there's code |
+| `lineage` | doesn't exist | required | **core**, with at least the spec version |
 | `domain` | optional, default `(-inf, inf)` | carried forward as declared | scoped the sampling that produced the verdict |
-| `condition` | doesn't exist | optional | the region the evidence actually covered, which may be narrower than `domain`; see `claim-anatomy.md` |
+| `condition` | doesn't exist | optional | the region the evidence actually covered, which may be narrower than `domain` |
 | `tolerance` | required when relevant, no default | carried forward when present | so a verified record is self-contained |
-| `grammar` | recommended, function-level or per-claim | carried forward | needed to read `statement` at all |
 | `meta` | optional | carried forward unchanged | opaque extension point, see below |
-| `intent` | proposed, pre-check | documented, from the docstring when one exists, overriding the declared string in the verified record | see "Where `intent` comes from" below |
+| `intent` | proposed, pre-check | documented, from the docstring when one exists | see "Where `intent` comes from" below |
 | `signature` | free-text, human-written, not verified | from the tool's own introspection | |
-| `identity` | doesn't exist | required | verified-only, nothing to hash before there's code |
-| `authored` | doesn't exist | required, stamped by the checking tool | see `verified-schema.md`, and **OPEN (B1)** |
-| `accepted` | doesn't exist | records a human decision about a claim | verified-only, see `verified-schema.md`, "Acceptance", and **OPEN (B2)** |
+| `accepted` | doesn't exist | records a human decision about a claim | see `verified-schema.md`, "Acceptance" |
 | `reasoning` | doesn't exist | generated by the tool | audit trail for how the record's own content was produced |
-| `lineage` | doesn't exist | required | which spec version, which tool, when |
+
+## Claim identity belongs to the grammar
+
+Two tools reading the same claim need to agree that it is the same claim.
+**This specification does not define how**, for the same reason it does
+not define what a domain's internal structure looks like: a claim's text
+is written in a grammar, and the grammar is what knows how to read it.
+
+A grammar that is used across more than one tool is therefore responsible
+for saying, in its own documentation:
+
+- **which spellings it accepts, and which of them is canonical**, where
+  it accepts more than one for the same thing;
+- **how a claim in it is identified**, if the grammar offers an identity
+  or fingerprint at all;
+- **whether a rendering round-trips**, so that reading back what the
+  grammar emitted gives the same claim.
+
+Those are real obligations, and a grammar that leaves them unanswered
+cannot be shared between implementations. They are just not this
+document's obligations to discharge. A tool states which grammar it is
+using (`grammar`), and everything about how that dialect's claims are
+written, compared and identified follows from there.
+
+The practical consequence is that questions like "does a conditional
+claim's statement carry its premise" are settled by the grammar, once,
+for every tool that uses it, rather than by this specification for
+grammars it has never seen.
+
+## The `meta` extension point
+
+Rather than this spec naming specific fields for capabilities that don't
+exist yet, `meta` is a single, optional, namespaced object that any tool or
+layer can put arbitrary content under, at the function level, the claim
+level, or both. Something nobody has designed yet writes whatever it
+needs under its own key. None of that requires this document to change: the
+core shape only needs to say that `meta` exists and that its contents are
+opaque to a reader that does not recognise them.
+
+A tool that doesn't understand a given `meta` key should pass
+it through unchanged rather than silently drop it; a tool that does
+understand it may read, enrich, or replace it. Nothing under `meta` is
+required: a record with several extensions' worth of content under `meta`
+is exactly as valid as one where `meta` is missing entirely.
+
+Two rules on top of v0.1.0's:
+
+- **Adjudication carries a claim's declared `meta` forward.** A tool that
+  checks a claim copies that claim's declared `meta` onto the recorded
+  claim, its own namespaced keys winning on a collision. Otherwise the
+  pass-through rule holds only until the first checker runs, which is the
+  moment it matters.
+- **Consumers ignore what they do not recognise.** This applies to
+  unrecognised keys wherever they appear, not only under `meta`. A reader
+  should preserve them on rewrite and place no other meaning on them. A
+  record carrying sections this document has never heard of is a normal
+  record, not a malformed one.
+
+## Open for extension: `route` and `verdict`
+
+Both are strings, not a fixed enum a reader should reject unknown values
+for. `claim-anatomy.md` and `evidence-ladder.md` document a well-known set
+for each (`probe`/`derive` for `route`; `proven`/`holds`/`documented`/`declared`/
+`unknown`/`falsified`/`invalidated`/`skipped` for `verdict`), and that set
+is what gives the evidence ladder a meaningful strength ordering. A tool built on a different
+verification technique, symbolic execution or an SMT solver, say, is
+expected to use whatever route and verdict actually fit what it did rather
+than force its evidence into the closest existing value. A value outside
+the documented set above is unranked in this version, not malformed, and
+folds to `undecided` in a rollup (see `evidence-ladder.md`, "Rolling
+verdicts up").
+
+### Subtypes: the colon convention
+
+A tool often knows more about how a verdict was reached than the base
+value carries. Rather than inventing a parallel field, subtype the value
+with a colon: `probe:semi_analytical`, `derive:extensive`,
+`skipped:unparseable`.
+
+**Classification splits at the first colon.** `skipped:unparseable` is a
+skip to every consumer that does not recognise the subtype, and anything
+prefixed `falsified:` counts as falsified in every gate. That is the
+whole contract: a reader that knows the subtype may use it, a reader that
+does not falls back to the base value and is never wrong about which
+bucket the claim is in.
+
+Two consequences worth stating:
+
+- **A subtype never changes the bucket.** A value whose base is
+  `skipped` is treated as a skip, so a tool cannot use `skipped:` to
+  smuggle a passing verdict past a strict gate.
+- **`route` names the mechanism that actually decided**, so cascade or
+  preference values (`auto`, `best`, "try the strongest first") are
+  **input-side instructions only** and never appear in a record. A
+  record's `route` is a statement about what happened.
+
+### Open vocabularies are additive only
+
+Every open vocabulary here, verdicts, routes, grammar names, and whatever
+a tool names in its own namespace, follows one discipline: **a value is
+public once released. It is never renamed, and never repointed at a
+different meaning. A new meaning gets a new value.**
+
+This is what lets a record written a year ago still be read correctly. A
+renamed value silently breaks every stored record that used it, and a
+repointed one is worse, because nothing breaks and the meaning quietly
+changes underneath.
 
 ## Where `intent` comes from
 
@@ -88,155 +234,21 @@ actually realized outranks the description of what was originally wanted.
 The declared `intent` is only used as a fallback, tagged `declared` rather
 than `documented`, when the function has no docstring at all to read.
 
-## Canonical form, and why it is the claim text
-
-A claim has an identity independent of any one tool: two tools checking
-the same claim should agree that it is the same claim. That identity is
-the **claim's own text, in the grammar it declares**, not the arrangement
-of YAML fields a particular tool happens to serialize it into.
-
-This matters as soon as anything hashes a claim. A fingerprint over YAML
-fields is a fingerprint over one tool's field layout, and a second
-implementation with a different layout computes a different value for the
-same claim, which defeats the purpose. A fingerprint over the canonical
-claim text is portable: a conformant tool in any language that implements
-the grammar can parse any accepted spelling, emit the canonical one, and
-arrive at the same value.
-
-Three rules follow, and a tool that hashes claims has to observe all
-three:
-
-1. **One canonical rendering per grammar.** A grammar that accepts
-   several spellings of one thing must define which is canonical and
-   canonicalise on parse. If `is_defined(f)` and `f is defined` mean the
-   same premise, they must render identically, because otherwise one
-   claim has two fingerprints.
-2. **The canonical rendering round-trips.** Parsing the canonical text
-   must give back the same claim. A rendering that loses part of the
-   claim is not a rendering of it.
-3. **The canonical rendering is the whole claim.** Everything that
-   changes what is being asserted is in the text: the quantified domain,
-   the premise if there is one, the relation, both sides.
-
-> **OPEN (E1)**: rule 3 decides a live question. A conditional claim
-> (`assuming x + y == 2, f(x, y) <= 1`) can render its premise into
-> `statement`, or carry the premise in a separate field and leave
-> `statement` unconditional. The reference implementation renders it in,
-> after a soundness bug where a statement without its premise re-parsed
-> as unconditional and the claim came back falsified on a point the
-> premise excludes. See `v0.2/OPEN-DECISIONS.md`.
-
-Whether a fingerprint is part of the schema at all, and under what name,
-is **OPEN (D3)**.
-
-## Verdict and route subtypes: the colon convention
-
-A tool often knows more about how a verdict was reached than the base
-value carries. Rather than inventing a parallel field, subtype the value
-with a colon: `probe:semi_analytical`, `derive:extensive`,
-`skipped:unparseable`.
-
-**Classification splits at the first colon.** `skipped:unparseable` is a
-skip to every consumer that does not recognise the subtype, and anything
-prefixed `falsified:` counts as falsified in every gate. That is the
-whole contract: a reader that knows the subtype may use it, a reader that
-does not falls back to the base value and is never wrong about which
-bucket the claim is in.
-
-Two consequences worth stating:
-
-- **A subtype never changes the bucket.** A value whose base is
-  `skipped` must be treated as a skip, so a tool must not use
-  `skipped:` as a way to smuggle a passing verdict past a strict gate.
-- **`route` names the mechanism that actually decided**, so cascade or
-  preference values (`auto`, `best`, "try the strongest first") are
-  **input-side instructions only** and never appear in a record. A
-  record's `route` is a statement about what happened.
-
-Anything finer than the subtype is implementation detail and belongs
-under `meta`.
-
-## The `meta` extension point
-
-Rather than this spec naming specific fields for capabilities that don't
-exist yet, `meta` is a single, optional, namespaced object that any tool or
-layer can put arbitrary content under, at the function level, the claim
-level, or both. Something nobody has designed yet writes whatever it
-needs under its own key. None of that requires this document to change: the
-core shape only needs to say that `meta` exists and that its contents are
-opaque to a reader that does not recognise them.
-
-A tool that doesn't understand a given `meta` key should pass
-it through unchanged rather than silently drop it; a tool that does
-understand it may read, enrich, or replace it. Nothing under `meta` is
-required: a record with several extensions' worth of content under `meta`
-is exactly as valid as one where `meta` is missing entirely.
-
-Two rules on top of v0.1.0's:
-
-- **Adjudication carries a claim's declared `meta` forward.** A tool that
-  checks a claim must copy that claim's declared `meta` onto the
-  recorded claim, its own namespaced keys winning on a collision.
-  Otherwise the pass-through rule holds only until the first checker
-  runs, which is the moment it matters.
-- **Records may carry implementation-defined `meta`, and consumers must
-  ignore what they do not recognise.** A tool is free to write whatever
-  its own layers need; nothing outside that tool may rely on it.
-
-### Unknown keys outside `meta`
-
-`meta` is the sanctioned place for extension, and a reader should not
-reject a record for carrying a top-level key this document does not
-name. It should preserve it on rewrite, the same way it preserves
-unrecognised `meta` keys, and place no other meaning on it.
-
-> **OPEN (D1, D2, D3)**: the reference implementation writes ten
-> top-level sections and three `identity` keys this document does not
-> name, including two (`concepts`, `math`) that v0.1.0 gave as examples
-> of `meta` content. Each is either a v0.2 field or belongs under `meta`.
-> See `v0.2/OPEN-DECISIONS.md`.
-
-## Open for extension: `route` and `verdict`
-
-Both are strings, not a fixed enum a reader should reject unknown values
-for. `claim-anatomy.md` and `evidence-ladder.md` document a well-known set
-for each (`probe`/`derive` for `route`; `proven`/`holds`/`documented`/`declared`/
-`unknown`/`falsified`/`invalidated`/`skipped` for `verdict`), and that set
-is what gives the evidence ladder a meaningful strength ordering. A tool built on a different
-verification technique, symbolic execution or an SMT solver, say, is
-expected to use whatever route and verdict actually fit what it did rather
-than force its evidence into the closest existing value. A value outside
-the documented set above is unranked in this version, not malformed, and
-folds to `undecided` in a rollup (see `evidence-ladder.md`, "Rolling
-verdicts up").
-
-### Open vocabularies are additive only
-
-Every open vocabulary in this spec, verdicts, routes, grammar names, and
-whatever a tool names in its own namespace, follows one discipline: **a
-value is public once released. It is never renamed, and never repointed
-at a different meaning. A new meaning gets a new value.**
-
-This is what lets a record written a year ago still be read correctly. A
-renamed value silently breaks every stored record that used it, and a
-repointed one is worse, because nothing breaks and the meaning quietly
-changes underneath.
-
 ## Versioning
 
 `lineage` states which version of this specification a record claims to
-follow. A reader should check it before assuming a field's meaning.
+follow, and a reader should check it before assuming a field's meaning.
+That is a core requirement; the recommended spelling is
+`lineage.spec_version`.
 
-> **OPEN (A3)**: this document and the reference implementation disagree
-> on the key names (`spec_version`/`timestamp` against
-> `CDD_spec_version`/`date`). **OPEN (F1)**: whether records additionally
-> carry a version of the *shape*, separate from the version of the spec,
-> since the shape can move within a spec version and already has. See
-> `v0.2/OPEN-DECISIONS.md`.
+Whether a record additionally carries a version of the *shape* it is
+written in, separate from the version of this specification, is
+implementation-defined. A tool whose own record shape moves faster than
+this document will want one.
 
 ## Where records get stored
 
-The shape above is the interoperability contract; where a tool persists it
+The shape above is what travels between tools; where a tool persists it
 is not, and nothing about the shape requires any particular file
 layout. A record only needs to be findable by its dotted-name key; a store
 could be one file with many top-level keys, one file per function, or
@@ -286,12 +298,8 @@ forward from the previous record, silently drops exactly the retained
 falsifications this specification says must survive.
 
 There are three ways a claim leaves the live list, and each records why:
-
-- **superseded**, when the same named claim is re-authored with a
-  different statement and a human adopts the change;
-- **a discovery**, when a falsification was right about the code and
-  wrong about the claim (`cdd.md`'s loop, step 5);
-- **historical**, when the code has moved past the claim entirely, for
-  example a parameter it quantified over no longer exists.
-
-In all three the row is retained, not removed. See `verified-schema.md`.
+it was **superseded** by a re-authored version of the same named claim, it
+became a **discovery** (`cdd.md`'s loop, step 5), or it is **historical**,
+the code having moved past it entirely. In all three the row is retained,
+not removed. How a tool arranges that retention is its own business; that
+it retains it is not.

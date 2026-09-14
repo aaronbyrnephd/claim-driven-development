@@ -7,6 +7,12 @@ What a conformant tool writes after checking a function's claims. One entry
 per function, keyed the same way. Where a tool persists this on disk is not
 part of this shape; see `record-schema.md`, "Where records get stored."
 
+Only the normative core is required (`record-schema.md`, "What this
+document requires, and what it leaves alone"). Everything else below is a
+**recommended spelling for a fact a tool may want to record**: if you
+record it, this is the name and meaning other tools will expect. The
+example is illustrative of a rich record, not a minimum.
+
 ```yaml
 geo.gc_distance:
   name: gc_distance
@@ -140,19 +146,17 @@ Notes:
 
 - **`identity.source_available`** is whether the tool had the function's
   source to analyze at all, as opposed to working from a docstring or
-  other external documentation only. Whether a proof was attempted, or
-  even possible, for this function is not summarized here: it's already
-  visible per-claim, in each claim's `route` and `verdict`.
-
-  > **OPEN (A1)**: the reference implementation does not emit this field.
+  other external documentation only. Worth recording, because "nothing
+  was proved" and "there was nothing to read" are different facts and a
+  reader cannot tell them apart from the claims alone. Optional: a tool
+  that never works from documentation alone has nothing to say here.
 
 - **`identity.pure`** is `true` only when the tool has a real
   basis for saying that the function has limited side effects (from source code analysis).
-  When it can't be analysed, `pure` is `null` instead of `false`.
-
-  > **OPEN (A2)**: the reference implementation sets `pure: true`
-  > unconditionally when it has no source, so an unanalysable function is
-  > currently reported as provably pure.
+  When it can't be analysed, `pure` is `null` instead of `false`. This is
+  the general rule in `cdd.md`, "Say what you know, and no more,"
+  applied to one field: `false` asserts impurity, and a tool that could
+  not look has not established that either.
 
 - **`claims[].verdict`** is `proven`, `holds`, `documented`, `declared`,
   `unknown`, `falsified`, `invalidated`, or `skipped` in a v0.2
@@ -210,10 +214,12 @@ name, for a claim it extracted or generated itself, a built-in probe, a
 domain-enforcement claim) is the portable minimum every conformant tool
 can provide regardless of language or parser.
 
-> **OPEN (B1)**: the reference implementation writes a *surface kind*
-> here (`docstring`, `decorator`, `declared`, ...) rather than an origin
-> reference, and writes the origin reference in its declared layer
-> instead, which this document says has no such field.
+> **OPEN (B1)**: `authored` is in the normative core, so what it holds
+> has to be agreed. This document says an origin reference. The
+> reference implementation writes a *surface kind* here (`docstring`,
+> `decorator`, `declared`, ...) and writes the origin reference in its
+> declared layer instead. Both facts are useful and they are not the
+> same fact. See `v0.2/OPEN-DECISIONS.md`.
 
 ## Records have memory
 
@@ -259,8 +265,11 @@ A discovery additionally declares the corrected claim in the live
 new one's supporting witness, and links the two so the record says what
 replaced what.
 
-> **OPEN (D2)**: whether these three sections are v0.2 fields or belong
-> under `meta`.
+The sections above are one arrangement, shown because it reads clearly.
+**What a tool does here is its own business; that it retains the row
+rather than dropping it is not.** A tool that keeps retired claims in the
+same list with a status field, or in a sidecar, satisfies the rule
+equally.
 
 ## Acceptance
 
@@ -299,8 +308,13 @@ There is deliberately **no accepting a bug**. If the code is wrong, the
 code changes; the recorded counterexample replays on every later
 adjudication until the claim stops falsifying.
 
-> **OPEN (B2)**: the scalar form and the object form are both described
-> here. v0.2 should pick one, or say how a reader tells them apart.
+Both forms above are conformant. **What this specification requires is
+the principle, not the shape**: an acceptance records who decided and
+when, it is bound to the version of the code the decision was made
+about, and it lapses when that version moves. A tool with one kind of
+acceptance and a bare identity string satisfies that; so does a tool
+with five kinds and an object. What neither may do is carry a human
+decision forward onto code nobody agreed to.
 
 ## Composing freshness
 
@@ -335,6 +349,12 @@ The re-adjudication triggers that follow are: the function's own `form`
 moved, its claim set moved, a dependency's `form` moved, or a dependency
 constant's value moved.
 
-> **OPEN (D1)**: whether `dependencies` is a v0.2 field or belongs under
-> `meta`. A claim-level form, where one claim depends on another claim
-> holding, is described in `declared-schema.md`.
+Whether a tool records this, and under what name, is
+implementation-defined. **The rule it exists to serve is not: a tool
+that reports a claim as current must have a basis for saying so.** A
+tool that only checks the function's own `form` should not report
+freshness it has not established, which is the same rule as everywhere
+else (`cdd.md`, "Say what you know, and no more").
+
+A claim-level form, where one claim depends on another claim holding, is
+described in `declared-schema.md`.

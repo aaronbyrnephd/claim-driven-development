@@ -123,6 +123,34 @@ by a sampler happening not to look there again. It is also what makes
 `invalidated` meaningful, since a regression is detected at the point it
 reappears.
 
+## Say what you know, and no more
+
+The method is worth something only because its outputs are calibrated. A
+verdict that overstates is worse than no verdict, because a reader who
+cannot trust the strong answers has no reason to trust the weak ones
+either.
+
+So, as a general rule over everything a conformant tool reports:
+
+> **A tool never reports a stronger epistemic state than it has a basis
+> for. Not knowing is spelled out, not defaulted to a confident value.**
+
+Most of this specification is that rule applied to a particular case:
+
+- `holds` is not `proven`, because trials are not a proof;
+- `unknown` exists so that "we ran and settled nothing" has somewhere to
+  go other than a verdict that implies it was checked;
+- a falsification needs a witness the code was actually run at;
+- a structural fact the tool could not establish is reported as unknown
+  rather than guessed (`verified-schema.md`'s `identity.pure` is the
+  worked example: `null`, not `false`, and certainly not `true`);
+- an acceptance lapses when the code it was about changes, because it was
+  never a decision about this code.
+
+The rule binds wherever a tool has the option of saying nothing and says
+something instead. It is the one thing in this document that a tool
+cannot be conformant while ignoring, whatever else it chooses to record.
+
 ## Additive-only vocabularies
 
 Several fields in this specification are open strings rather than closed
@@ -210,8 +238,9 @@ Every term used across this repo, linked from here.
   condition. Part of the claim, not a narrowing of it.
   [`claim-anatomy.md`](claim-anatomy.md).
 - **canonical form**: the one rendering of a claim's text that a grammar
-  designates, so two tools agree on the claim's identity.
-  [record-schema.md, "Canonical form"](record-schema.md).
+  designates, so two tools agree on the claim's identity. Defined by the
+  grammar, not by this specification. [record-schema.md, "Claim identity
+  belongs to the grammar"](record-schema.md).
 - **declared shape / declared layer**: how a claim set is proposed, before
   verification, intermediary and disposable. [record-schema.md, "Declared vs
   verified"](record-schema.md#declared-vs-verified); the shape itself is

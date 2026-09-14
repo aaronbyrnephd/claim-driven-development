@@ -77,10 +77,11 @@ empirically cannot itself be `proven`, whatever route decided it. The
 weakest link bounds the result, and a tool should record that it did.
 
 **A premise is part of the claim.** It changes what is being asserted, so
-a rendering of the claim that omits it does not denote the same claim.
-This has teeth beyond one tool: see `record-schema.md`, "Canonical form,"
-for why, and **OPEN (E1)** for the live question of exactly where the
-premise is written.
+a rendering that omits it does not denote the same claim. Whether a
+grammar carries it inside the statement text or in a field beside it is
+the grammar's decision (see `record-schema.md`, "Claim identity belongs
+to the grammar"); what no tool may do is drop it and record a statement
+that reads as unconditional.
 
 ## Domain: declared vs enforced
 

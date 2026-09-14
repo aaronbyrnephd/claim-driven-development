@@ -76,16 +76,11 @@ f(x, k) == x/k`) or in a separate `premise` field; what it may not do is
 drop it, or record a statement that reads as unconditional when the claim
 is not.
 
-> **OPEN (E1)**: which of those two is canonical is unsettled, and it is
-> not a presentational question: a fingerprint over the claim text gives
-> two different answers for one claim if two tools choose differently.
-> See `record-schema.md`, "Canonical form," and `v0.2/OPEN-DECISIONS.md`.
-
-**Alternative spellings must canonicalise.** A grammar that accepts more
-than one spelling of the same thing has to define which is canonical and
-emit that one. Two spellings that survive into two different recorded
-statements are two claims as far as any consumer can tell, including the
-tool that wrote them.
+Which of those two a grammar chooses, and how it renders a claim
+canonically, is the grammar's decision to publish, not this document's
+to make: see `record-schema.md`, "Claim identity belongs to the
+grammar." What matters here is only that the premise is not lost, since
+a claim recorded without it asserts something the author did not.
 
 ### Claim dependencies
 

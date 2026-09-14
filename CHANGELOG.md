@@ -5,42 +5,67 @@ Versioned independently of any implementation. A record's
 
 ## 0.2.0 (unreleased, draft)
 
-Drafted from experience implementing v0.1.0. Everything here is additive
-or a narrowing of something v0.1.0 left ambiguous; no v0.1.0 field is
-removed or repointed. `v0.2/OPEN-DECISIONS.md` lists the questions this
-draft deliberately leaves open, and is deleted before release.
+Drafted from experience implementing v0.1.0. The largest change is one of
+scope: v0.2 states the method and pins only a small normative core,
+leaving the rest to implementations. Nothing from v0.1.0 is removed or
+repointed; several things it required become recommended instead.
 
-- **Verdict vocabulary**: `unknown` (adjudication settled nothing, or the
-  claim has not been checked yet) and `invalidated` (a claim that was
-  supported and no longer is) join the ladder. `skipped` narrows to
-  attempted-and-blocked-with-a-reason, which is what it shared with
-  `unknown` before.
-- **Stance fold**: a standard rollup (`supported`, `refuted`, `blocked`,
+`v0.2/OPEN-DECISIONS.md` lists the few questions the draft still leaves
+open, and is deleted before release.
+
+**Scope**
+
+- **A small normative core.** Two tools must agree on `claims`
+  (`name`, `statement`, `verdict`, `route`, `authored`), `grammar`,
+  `identity` (`form`, `sig`) and `lineage` (the spec version).
+  Everything else is implementation-defined. Fields named elsewhere in
+  these documents are recommended spellings for facts a tool may want to
+  record, not a checklist it is measured against.
+- **Claim identity belongs to the grammar.** Canonical rendering,
+  alternative spellings, and whether a claim has a fingerprint at all are
+  the grammar's to define and publish, not this specification's, for the
+  same reason a domain's internal structure already was.
+
+**Method**
+
+- **Say what you know, and no more**: the general epistemic rule, stated
+  once. A tool never reports a stronger epistemic state than it has a
+  basis for, and not knowing is spelled out rather than defaulted to a
+  confident value. Most of the rest of this document is that rule applied
+  to a case.
+- **A falsification requires an executed witness**, and a retained
+  counterexample is replayed as a pin on every later adjudication.
+- **Additive-only vocabularies**: a released value is never renamed and
+  never repointed.
+
+**Vocabulary**
+
+- `unknown` (adjudication settled nothing, or the claim has not been
+  checked) and `invalidated` (was supported, no longer is) join the
+  ladder; `skipped` narrows to attempted-and-blocked-with-a-reason, which
+  is what it was sharing with `unknown`.
+- A standard stance fold (`supported`, `refuted`, `blocked`,
   `undecided`), so tools counting verdicts produce comparable numbers.
-- **Subtypes**: the colon convention (`probe:semi_analytical`,
-  `skipped:unparseable`), classified at the first colon, and the rule
-  that `route` names the mechanism that actually decided, so cascade
-  values never appear in a record.
-- **Canonical form**: a claim's identity is its text in the grammar it
-  declares, not a tool's field layout. Grammars must canonicalise
-  alternative spellings, and a canonical rendering must round-trip.
-- **Premises**: a claim true only under a side condition states it, and
-  a premise naming another claim caps the evidence at the weakest link.
-- **Claim dependencies**: one typed entry (`kind`, `ref`, `requires`),
-  with `claim` and `function-form` as the well-known kinds.
-- **Records have memory**: claim membership is append-only, with
-  `superseded`, discovery and `historical` as the three retaining exits;
-  `invalidated` makes a regression explicit rather than silent.
-- **Acceptance**: an object form binding a human decision to the `form`
-  hash it was made about, so the decision goes stale when the code moves.
-- **Freshness composition**: function-level dependencies carry a callee's
-  `form` and a constant's value, so a behavioural change nothing else
-  would notice still invalidates the claims that rested on it.
-- **Soundness language**: a falsification requires an executed witness,
-  and a retained counterexample is replayed as a pin on every later
-  adjudication.
-- **Additive-only vocabularies**: a released value in any open vocabulary
-  is never renamed and never repointed.
+- The colon subtype convention, classified at the first colon, and the
+  rule that `route` names the mechanism that actually decided, so cascade
+  values never reach a record.
+
+**Claims and records**
+
+- **Premises**: a claim true only under a side condition states it rather
+  than being narrowed or dropped, and a premise naming another claim caps
+  the evidence at the weakest link.
+- **Typed claim dependencies** (`kind`, `ref`, `requires`), with `claim`
+  and `function-form` as the well-known kinds.
+- **Claim membership is append-only**: an adjudicated claim leaves the
+  live list only by being superseded, retained as a discovery, or marked
+  historical, and is retained in every case.
+- **Acceptance** is defined by its principle: it records who decided and
+  when, binds to the version of code it was about, and lapses when that
+  version moves. The shape is the tool's.
+- **Freshness composes**: `form` alone does not establish that a claim is
+  current, because behaviour also depends on what a function calls and
+  reads.
 - `lineage.commit` and `claims[].condition` are named as optional fields.
 
 ## 0.1.0 (2026-08-01)
