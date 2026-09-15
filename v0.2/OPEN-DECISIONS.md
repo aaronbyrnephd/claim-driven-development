@@ -104,7 +104,13 @@ Options:
 3. **Two fields**: `authored` for the origin reference (core, required)
    and something like `authored_surface` for the kind (optional).
 
-**Ruling:** [ ] 1  [ ] 2  [ ] 3  [ ] other
+**Ruling** (tick one, in PR #1's description):
+
+- [ ] **B1.1** `authored` is the origin reference; mathema moves its
+      declared-layer tag into the verified record
+- [ ] **B1.2** `authored` is either; tool's choice
+- [ ] **B1.3** two fields: `authored` (origin, core) and
+      `authored_surface` (kind, optional)
 
 ### A3. The spelling of the spec-version key
 
@@ -117,7 +123,10 @@ what any existing reader would look for; `CDD_spec_version` is less
 ambiguous in a record that may carry several version fields from
 different layers.
 
-**Ruling:** [ ] `spec_version`, mathema moves  [ ] `CDD_spec_version`, spec moves  [ ] other
+**Ruling** (tick one, in PR #1's description):
+
+- [ ] **A3.1** `lineage.spec_version`; mathema moves
+- [ ] **A3.2** `lineage.CDD_spec_version`; the spec moves
 
 ### S1. Six documents, or one
 
@@ -125,7 +134,11 @@ v0.1.0 is six documents. This draft keeps the split so the diff is
 reviewable per concern. Consolidation has been raised before and never
 ruled, and is a separate question from any of the content above.
 
-**Ruling:** [ ] keep six  [ ] consolidate to one  [ ] decide after the content is agreed
+**Ruling** (tick one, in PR #1's description):
+
+- [ ] **S1.1** keep the six documents
+- [ ] **S1.2** consolidate to one
+- [ ] **S1.3** decide after the content is agreed
 
 ---
 
