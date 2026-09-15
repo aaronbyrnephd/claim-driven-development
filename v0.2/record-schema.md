@@ -22,7 +22,7 @@ so long as the core is present and correct.
 
 | | |
 |---|---|
-| `claims` | the list of claims, each with `name`, `statement`, `verdict`, `route`, and `authored` (an object, of which only `authored.surface` is required) |
+| `claims` | the list of claims, each with `name`, `statement`, `verdict`, `route` (`null` until an adjudication actually decided, since `route` names the mechanism that decided), and `authored` (an object, of which only `authored.surface` is required) |
 | `grammar` | which expression dialect the statements are written in, at function level or per claim |
 | `identity` | with at least `form` and `sig` |
 | `lineage` | with at least the spec version the record conforms to |
@@ -81,7 +81,7 @@ and what changes crossing from declared to verified. Only the rows marked
 |---|---|---|---|
 | `name` | claim name, required | carried forward unchanged | **core** |
 | `statement` | required | required, carried forward unchanged | **core**; same field name in both shapes, not renamed in transit |
-| `route` | optional, default `probe` | required, and names the mechanism that actually decided | **core**; see "Open for extension" below |
+| `route` | optional, default `probe` | required once adjudicated, `null` before (a never-adjudicated claim has no mechanism to name) | **core**; see "Open for extension" below |
 | `verdict` | doesn't exist | required | **core**; a declared claim hasn't been checked yet |
 | `authored` | optional, what the author knows (`by`, `at`, `ref`) | required object; the tool stamps what it observes and merges the declared part forward | **core**, but only `authored.surface` within it; see `verified-schema.md` |
 | `grammar` | recommended, function-level or per-claim | carried forward | **core**; needed to read `statement` at all |
