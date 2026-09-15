@@ -49,6 +49,7 @@ Fields per claim:
 | `tolerance` | required when `statement` does a near-equality float comparison | how close counts as equal; no spec-level default, see "Tolerance has no default, and is left to the implementation" below |
 | `premise` | no | what the claim assumes, when it is true only under a side condition; see "Premises" below and `claim-anatomy.md` |
 | `dependencies` | no | what this claim requires to hold first; see "Claim dependencies" below |
+| `authored` | no | what the author knows about the claim's origin (`by`, `at`, `ref`), merged forward by the checking tool; see below |
 | `meta` | no | a namespaced bucket for anything not defined by this spec; see `record-schema.md`, "The `meta` extension point" |
 
 `statement` is the one field name shared between the declared and verified
@@ -59,10 +60,13 @@ which means something different on each side (see `record-schema.md`,
 that record is self-contained, readable, and checkable against, without
 having to go back to whatever declared it. See `verified-schema.md`.
 
-The declared shape has no `authored` field: a claim's origin is stamped
-by the checking tool, not asserted by the thing being checked. See
-`verified-schema.md`, "Tracing a claim back to where it was authored",
-and **OPEN (B1)**.
+A declared claim **may** carry an `authored` object holding what its
+author knows and a checker cannot observe: who wrote it (`by`), when
+(`at`), and a reference if the authoring format has one. The checking
+tool adds what it does observe and carries the rest forward, and a
+stated author is never overwritten. The verified record is where this
+resolves; see `verified-schema.md`, "`authored`: tracing a claim back to
+where it came from."
 
 ### Premises
 

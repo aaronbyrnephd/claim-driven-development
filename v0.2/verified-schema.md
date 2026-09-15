@@ -31,7 +31,9 @@ geo.gc_distance:
       verdict: proven
       counterexample: null
       condition: "for all p, q on the unit sphere"
-      authored: gc_distance_cdd.yaml
+      authored:
+        surface: claims-file
+        ref: gc_distance_cdd.yaml
     - name: nonnegative
       statement: "d(p, q) >= 0"
       route: probe
@@ -43,7 +45,11 @@ geo.gc_distance:
       meta:
         concepts: [metric-space]
         comments: "......"
-      authored: geo.gc_distance:decorator:L142
+      authored:
+        surface: decorator
+        ref: "geo.gc_distance:decorator:L142"
+        by: janesmith@corp.org
+        at: "2026-08-10 14:20:05"
     - name: never_exceeds_pi
       statement: "d(p, q) <= 3.14159265"
       route: probe
@@ -52,14 +58,22 @@ geo.gc_distance:
       n: 64
       counterexample: [(1.5707963, 0.0),(-1.5707963, 0.0)]
       accepted: janesmith@corp.org 
-      authored: geo/symspec.yaml
+      authored:
+        surface: claims-file
+        ref: geo/symspec.yaml
+        by: janesmith@corp.org
+        commit: 4f2a9c1e8b7d3a6f0e5c2b9d8a1f4e7c3b6d0a9e
+        reviewed:
+          - by: alexlee@corp.org
+            at: "2026-08-12 09:02:11"
     - name: monotone_in_latitude
       statement: "d(p, q) >= d(p, r)"
       route: probe
       verdict: invalidated
       n: 128
       counterexample: [(0.4, 0.0),(0.9, 0.0),(0.6, 0.0)]
-      authored: geo/symspec.yaml
+      authored:
+        surface: docstring
       meta:
         previous_verdict: holds
   reasoning:
@@ -71,7 +85,7 @@ geo.gc_distance:
       basis: "proven, derived from symbolic logic"
   lineage:
     generated_by: example-tool 0.1.0
-    spec_version: 0.2.0
+    CDD_spec_version: 0.2.0
     timestamp: "2026-08-11 16:04:21"
     commit: 4f2a9c1e8b7d3a6f0e5c2b9d8a1f4e7c3b6d0a9e
 ```
@@ -103,9 +117,9 @@ produced the verdict, and `meta` because a tool that doesn't understand a
 given extension should still pass it through rather than lose it on the
 way to a verified record.
 
-`authored` isn't carried forward the same way: the declared shape has no
-such field. A checking tool stamps it in itself, as it reads each claim;
-see "Tracing a claim back to where it was authored" below.
+`authored` works differently: the checking tool stamps what it observes,
+and merges in whatever the declared layer knew that it cannot. See
+"`authored`: tracing a claim back to where it came from" below.
 
 Notes:
 
@@ -184,7 +198,7 @@ Notes:
   whatever else records who actually made that call. See "Acceptance"
   below for the fuller form.
 
-- **`lineage.spec_version`** states which version of this document the
+- **`lineage.CDD_spec_version`** states which version of this document the
   record conforms to. A reader should check it before assuming a field's
   meaning, since the schema may grow.
 
@@ -193,33 +207,111 @@ Notes:
   lets a reader go and look at the exact implementation a verdict was
   about, rather than the one in front of them now.
 
-### Tracing a claim back to where it was authored
+### `authored`: tracing a claim back to where it came from
 
-**`claims[].authored`**, once claims from more than one file, or a mix of declared-layer and
+Once claims from more than one file, or a mix of declared-layer and
 tool-extracted claims, end up merged into one list, a falsified claim
 needs to be traceable back to whoever wrote it, the same way a failing
 test points at the file and line that defined it, not just a bare
-assertion with no origin. A file path is the common
-case (`module.func_name_cdd.yaml`, or wherever a human's claim came from), but
-`authored` can hold whatever a tool has, a person's name, an agent's
-identity, a git reference, its own name for a claim it generated rather
-than a human writing one.
+assertion with no origin.
 
-**`claims[].authored` is required in the verified shape**, not
-optional: every claim in a machine-produced record traces to something,
-and a record shouldn't be able to present a claim with no answer to
-"where did this come from." Line-level attribution, when a tool's parser
-can produce it, is worth adding on top, but a file path (or a tool's own
-name, for a claim it extracted or generated itself, a built-in probe, a
-domain-enforcement claim) is the portable minimum every conformant tool
-can provide regardless of language or parser.
+`authored` is an object, and **it is required**: every claim in a
+machine-produced record traces to something, and a record should not be
+able to present a claim with no answer to "where did this come from."
 
-> **OPEN (B1)**: `authored` is in the normative core, so what it holds
-> has to be agreed. This document says an origin reference. The
-> reference implementation writes a *surface kind* here (`docstring`,
-> `decorator`, `declared`, ...) and writes the origin reference in its
-> declared layer instead. Both facts are useful and they are not the
-> same fact. See `v0.2/OPEN-DECISIONS.md`.
+How much it holds varies enormously by setting, and deliberately so. A
+small project may know only that a claim came from a docstring. A
+regulated one needs the commit, the git identity, and who reviewed it.
+Both are conformant.
+
+```yaml
+      # the least a tool can say
+      authored:
+        surface: docstring
+
+      # a fuller record of the same claim
+      authored:
+        surface: claims-file
+        ref: "geo/symspec.yaml#L14"
+        by: janesmith@corp.org
+        at: "2026-08-11 16:04:21"
+        commit: 4f2a9c1e8b7d3a6f0e5c2b9d8a1f4e7c3b6d0a9e
+        reviewed:
+          - by: alexlee@corp.org
+            at: "2026-08-12 09:02:11"
+```
+
+**`surface` is the only required key**, and it is the minimum for
+interop. It is the one fact a checking tool cannot fail to have: it read
+the claim from somewhere, and it knows where. A file path may not exist
+(a claim the tool generated itself has none), an author may be unknown
+(a claim inherited from a repository nobody remembers), a commit may not
+apply (a store outside version control), but the surface is always
+known. Requiring anything richer would make the field unfillable for
+some honest tool, and requiring less would let a record present a claim
+from nowhere.
+
+Well-known values, open for extension the same way `route` and `verdict`
+are: `docstring`, `decorator`, `annotation`, `claims-file`, `inline`,
+`generated`.
+
+The rest are recommended spellings. Record them when you have them:
+
+| key | holds |
+|---|---|
+| `ref` | where exactly: a path, a `path#Lnn`, a URL, whatever locates it |
+| `by` | who: a person, a team, an agent, or the tool's own name for a claim it generated |
+| `at` | when the claim was authored |
+| `commit` | the revision it was authored in |
+| `reviewed` | a list of `{by, at}` events, for a claim someone checked before it was trusted |
+
+`by` is worth recording even when it is a machine. `cdd.md`'s loop
+explicitly allows a claim to be *proposed* by an agent, and explicitly
+does not exempt such a claim from being checked; a reader who can see
+that a claim was model-proposed can weigh it accordingly, and one who
+cannot, cannot.
+
+`reviewed` is a list rather than a single entry because review is an
+event that can happen more than once, and because a tool that starts
+with one reviewer and later needs an approval chain should not have to
+change the shape to get it.
+
+**Anything else goes in the same object.** A tool that tracks a ticket
+number, an approval workflow state, or a model's prompt hash puts it
+here under its own name, and a reader that does not recognise it passes
+it through (`record-schema.md`, "The `meta` extension point"). The
+object is open in exactly the way the rest of the specification is.
+
+#### The declared layer may fill part of it
+
+v0.1.0 said the declared shape had no `authored` field, on the reasoning
+that a claim's origin is stamped by the checker rather than asserted by
+the thing being checked. That holds for what a checker can observe, and
+not for what only the author knows.
+
+So: **a declared claim may carry an `authored` object with what its
+author knows**, typically `by`, `at`, and a `ref` if the authoring
+format has one. A checking tool fills in what it observes (`surface`
+always, `commit` and a more precise `ref` when it can) and carries the
+rest forward unchanged.
+
+**A checking tool does not overwrite an authorship fact the declared
+layer asserted.** It cannot know better than the author who wrote a
+claim. Where both have a value for the same key, the declared one wins
+for `by` and `at`, and the tool's wins for anything it observed
+directly. A tool that finds itself discarding a stated author is doing
+something wrong.
+
+Either way, **the verified record is where this resolves**. A reader of
+the record gets the merged result and never needs the declared file,
+which is the same rule as everything else in this shape.
+
+#### Reading a v0.1.0 record
+
+In v0.1.0 `authored` was a bare string. A v0.2 reader encountering one
+treats it as `{ref: <string>}`: v0.1.0's own examples were file paths
+and references, so that is what the value meant. A v0.2 writer always
+writes the object.
 
 ## Records have memory
 

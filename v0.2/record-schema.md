@@ -22,7 +22,7 @@ so long as the core is present and correct.
 
 | | |
 |---|---|
-| `claims` | the list of claims, each with `name`, `statement`, `verdict`, `route`, `authored` |
+| `claims` | the list of claims, each with `name`, `statement`, `verdict`, `route`, and `authored` (an object, of which only `authored.surface` is required) |
 | `grammar` | which expression dialect the statements are written in, at function level or per claim |
 | `identity` | with at least `form` and `sig` |
 | `lineage` | with at least the spec version the record conforms to |
@@ -83,10 +83,10 @@ and what changes crossing from declared to verified. Only the rows marked
 | `statement` | required | required, carried forward unchanged | **core**; same field name in both shapes, not renamed in transit |
 | `route` | optional, default `probe` | required, and names the mechanism that actually decided | **core**; see "Open for extension" below |
 | `verdict` | doesn't exist | required | **core**; a declared claim hasn't been checked yet |
-| `authored` | doesn't exist | required, stamped by the checking tool | **core**; see `verified-schema.md` |
+| `authored` | optional, what the author knows (`by`, `at`, `ref`) | required object; the tool stamps what it observes and merges the declared part forward | **core**, but only `authored.surface` within it; see `verified-schema.md` |
 | `grammar` | recommended, function-level or per-claim | carried forward | **core**; needed to read `statement` at all |
 | `identity` | doesn't exist | required | **core**, with at least `form` and `sig`; nothing to hash before there's code |
-| `lineage` | doesn't exist | required | **core**, with at least the spec version |
+| `lineage` | doesn't exist | required | **core**, with at least `CDD_spec_version`. Record-level; not to be confused with a claim's own `authored` |
 | `domain` | optional, default `(-inf, inf)` | carried forward as declared | scoped the sampling that produced the verdict |
 | `condition` | doesn't exist | optional | the region the evidence actually covered, which may be narrower than `domain` |
 | `tolerance` | required when relevant, no default | carried forward when present | so a verified record is self-contained |
@@ -239,7 +239,10 @@ than `documented`, when the function has no docstring at all to read.
 `lineage` states which version of this specification a record claims to
 follow, and a reader should check it before assuming a field's meaning.
 That is a core requirement; the recommended spelling is
-`lineage.spec_version`.
+`lineage.CDD_spec_version`. The key is spelled out rather than a bare
+`spec_version` because a record routinely carries version fields from
+several layers at once, and which specification a record follows should
+not be the ambiguous one.
 
 Whether a record additionally carries a version of the *shape* it is
 written in, separate from the version of this specification, is

@@ -1,7 +1,8 @@
 # CDD spec changelog
 
 Versioned independently of any implementation. A record's
-`lineage.spec_version` field states which version it conforms to.
+`lineage.CDD_spec_version` field states which version it conforms to.
+(v0.1.0 spelled this `lineage.spec_version`; see the 0.2.0 entry.)
 
 ## 0.2.0 (unreleased, draft)
 
@@ -10,7 +11,7 @@ scope: v0.2 states the method and pins only a small normative core,
 leaving the rest to implementations. Nothing from v0.1.0 is removed or
 repointed; several things it required become recommended instead.
 
-`v0.2/OPEN-DECISIONS.md` lists the few questions the draft still leaves
+`v0.2/DECISIONS.md` lists the few questions the draft still leaves
 open, and is deleted before release.
 
 **Scope**
@@ -66,6 +67,18 @@ open, and is deleted before release.
 - **Freshness composes**: `form` alone does not establish that a claim is
   current, because behaviour also depends on what a function calls and
   reads.
+- **`authored` becomes an object**, so one field serves both a small
+  project and a regulated one. Only `authored.surface` is required, on
+  the reasoning that it is the single fact a checking tool cannot fail
+  to have; `ref`, `by`, `at`, `commit` and a `reviewed` event list are
+  recorded when a tool has them, and a tool may add its own keys. The
+  declared layer may now carry the part only the author knows, and a
+  stated author is never overwritten by a checker. A v0.1.0 bare string
+  reads as `{ref: <string>}`.
+- **`lineage.spec_version` becomes `lineage.CDD_spec_version`**, spelled
+  out because a record routinely carries version fields from several
+  layers and which specification it follows should not be the ambiguous
+  one.
 - `lineage.commit` and `claims[].condition` are named as optional fields.
 
 ## 0.1.0 (2026-08-01)

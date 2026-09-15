@@ -249,10 +249,11 @@ Every term used across this repo, linked from here.
   actually checking a declared claim set, the artifact that persists.
   [record-schema.md, "Declared vs verified"](record-schema.md#declared-vs-verified);
   the shape itself is [`verified-schema.md`](verified-schema.md).
-- **`authored`**: traces a verified claim back to where it was proposed, a
-  file, a person, an agent, a tool. [verified-schema.md, "Tracing a claim back
-  to where it was
-  authored"](verified-schema.md#tracing-a-claim-back-to-where-it-was-authored).
+- **`authored`**: an object tracing a claim back to where it came from.
+  Only `surface` (which kind of authoring surface it was read from) is
+  required; `ref`, `by`, `at`, `commit` and `reviewed` are recorded when
+  a tool has them, so the same field serves a small project and a
+  regulated one. [`verified-schema.md`](verified-schema.md).
 - **`accepted`**: whether a falsified claim was diagnosed as a bug or as
   genuine retained knowledge, and who made that call.
   [`verified-schema.md`](verified-schema.md).
@@ -267,7 +268,7 @@ Every term used across this repo, linked from here.
   point"](record-schema.md#the-meta-extension-point).
 - **identity (`form` / `sig`)**: two hashes answering different questions,
   "same implementation" and "same interface." [`verified-schema.md`](verified-schema.md).
-- **`lineage.spec_version`**: which version of this spec a record conforms
+- **`lineage.CDD_spec_version`**: which version of this spec a record conforms
   to. [`verified-schema.md`](verified-schema.md).
 - **append-only membership**: an adjudicated claim leaves the live list
   only by being superseded, retained as a discovery, or marked
