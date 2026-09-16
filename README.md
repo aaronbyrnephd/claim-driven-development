@@ -168,11 +168,17 @@ its choices.
 
 ## Contributing
 
-Contributions are welcome and go through an ordinary pull request. A
-first contribution asks you to accept the
-[Contributor Licence Agreement](CLA.md), the same document the
-reference implementation uses; it is a licence grant, not an
-assignment, and it never limits what you do with your own work.
+Contributions are welcome and go through an ordinary pull request.
+With your first one, state in the PR description that you accept the
+[Contributor Licence Agreement](CLA.md); one sentence is enough, no
+tooling involved. The agreement is a licence grant, not an assignment,
+it never limits what you do with your own work, and its section 3
+means your contribution can never be relicensed into anything closed:
+the specification's stay-open promise binds the maintainer too, the
+same way ShareAlike binds everyone else. What it adds over the licence
+alone is a patent grant (which Creative Commons licences exclude) and
+the ability for the specification to move to another open home, a
+standards body, say, without hunting down every past contributor.
 
 ## License
 
