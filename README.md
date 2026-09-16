@@ -66,7 +66,7 @@ implementation has actually implemented those properties correctly, via running 
    check.
 
 Full definition, including who typically does each step and a diagram of
-the cycle: [`v0.1.0/cdd.md`](v0.1.0/cdd.md).
+the cycle: [`v0.2/cdd.md`](v0.2/cdd.md).
 
 ## Why not an existing verification approach
 
@@ -90,7 +90,7 @@ role it plays are what's different.
   informs the generation prompt if AI is used), not a check on code that already exists,
   though claims can just as well be retrofitted onto code that predates
   them; **CDD** doesn't require greenfield. A claim's `statement` (see
-  `v0.1.0/declared-schema.md`) can be written in whatever expression grammar
+  `v0.2/declared-schema.md`) can be written in whatever expression grammar
   a tool defines, including one that's a superset of an existing
   property-testing library's own property language, so adopting **CDD**
   doesn't require throwing away properties already written for QuickCheck
@@ -130,19 +130,29 @@ having a single, known, trusted author.
 
 ## What's in this repo
 
-- [`v0.1.0/cdd.md`](v0.1.0/cdd.md): the workflow, the evidence ladder.
-- [`v0.1.0/claim-anatomy.md`](v0.1.0/claim-anatomy.md): the claim
-  structure (domain, statement, tolerance, evidence route).
-- [`v0.1.0/record-schema.md`](v0.1.0/record-schema.md): how the declared
-  and verified shapes relate. This is the actual interoperability
-  contract: any tool that reads and writes these shapes can work with any
-  other tool that does, without depending on its code.
-- [`v0.1.0/declared-schema.md`](v0.1.0/declared-schema.md): the YAML shape
-  for proposing a claim set, before anything is checked.
-- [`v0.1.0/verified-schema.md`](v0.1.0/verified-schema.md): the YAML shape
-  a conformant tool writes after checking one.
-- [`v0.1.0/evidence-ladder.md`](v0.1.0/evidence-ladder.md): the verdict
-  vocabulary and what each verdict means.
+Each published version has its own directory, immutable once released.
+**v0.2 is current**; v0.1.0 remains for records that conform to it (a
+record's `lineage.CDD_spec_version` says which to read it against).
+
+- [`v0.2/cdd.md`](v0.2/cdd.md): the workflow, the epistemic rules
+  ("say what you know, and no more", the executed-witness rule for
+  falsification), additive-only vocabularies.
+- [`v0.2/claim-anatomy.md`](v0.2/claim-anatomy.md): the claim
+  structure (domain, statement, tolerance, evidence route, premise).
+- [`v0.2/record-schema.md`](v0.2/record-schema.md): the small
+  normative core two tools must agree on, and everything the spec
+  deliberately leaves implementation-defined. Claim identity belongs
+  to the grammars.
+- [`v0.2/declared-schema.md`](v0.2/declared-schema.md): the YAML shape
+  for proposing a claim set, before anything is checked, including
+  premises and typed claim dependencies.
+- [`v0.2/verified-schema.md`](v0.2/verified-schema.md): the YAML shape
+  a conformant tool writes after checking one, including the
+  `authored` object, acceptance, records-have-memory, and freshness
+  composition.
+- [`v0.2/evidence-ladder.md`](v0.2/evidence-ladder.md): the verdict
+  vocabulary (`unknown` and `invalidated` join in v0.2), the stance
+  fold, strict vs lenient.
 - [`CHANGELOG.md`](CHANGELOG.md): spec versions, on their own cadence,
   independent of any implementation's release schedule.
 
@@ -156,10 +166,26 @@ The first tool (in development) against this spec is **mathema**, a downstream p
 project. Nothing in this spec depends on it or assumes
 its choices.
 
+## Contributing
+
+Contributions are welcome and go through an ordinary pull request.
+With your first one, state in the PR description that you accept the
+[Contributor Licence Agreement](CLA.md); one sentence is enough, no
+tooling involved. The agreement is a licence grant, not an assignment,
+it never limits what you do with your own work, and its section 3
+means your contribution can never be relicensed into anything closed:
+the specification's stay-open promise binds the maintainer too, the
+same way ShareAlike binds everyone else. What it adds over the licence
+alone is a patent grant (which Creative Commons licences exclude) and
+the ability for the specification to move to another open home, a
+standards body, say, without hunting down every past contributor.
+
 ## License
 
-The documents in this repo are CC-BY-4.0: reuse and adapt freely, with
-attribution. That's deliberately a different kind of license from whatever
-an implementation might use for its code (a software license like MIT or
-Apache-2.0); the spec for CDD is meant to be able to
-move independently from any implementations.
+The documents in this repo are CC BY-SA 4.0: reuse and adapt freely,
+with attribution, and a derivative of the specification stays open
+under the same terms. That's deliberately a different kind of license
+from whatever an implementation might use for its code (a software
+license, or a source-available one); the spec for CDD is meant to be
+able to move independently from any implementations, and ShareAlike is
+what keeps a fork of the spec itself from being closed.
