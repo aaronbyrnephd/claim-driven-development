@@ -81,7 +81,7 @@ and what changes crossing from declared to verified. Only the rows marked
 |---|---|---|---|
 | `name` | claim name, required | carried forward unchanged | **core** |
 | `statement` | required | required, carried forward unchanged | **core**; same field name in both shapes, not renamed in transit |
-| `route` | optional, default `probe` | required once adjudicated, `null` before (a never-adjudicated claim has no mechanism to name) | **core**; see "Open for extension" below |
+| `route` | optional; unstated leaves the choice to the tool | required once adjudicated, `null` before (a never-adjudicated claim has no mechanism to name) | **core**; see "Open for extension" below |
 | `verdict` | doesn't exist | required | **core**; a declared claim hasn't been checked yet |
 | `authored` | optional, what the author knows (`by`, `at`, `ref`) | required object; the tool stamps what it observes and merges the declared part forward | **core**, but only `authored.surface` within it; see `verified-schema.md` |
 | `grammar` | recommended, function-level or per-claim | carried forward | **core**; needed to read `statement` at all |
@@ -89,7 +89,7 @@ and what changes crossing from declared to verified. Only the rows marked
 | `lineage` | doesn't exist | required | **core**, with at least `CDD_spec_version`. Record-level; not to be confused with a claim's own `authored` |
 | `domain` | optional, default `(-inf, inf)` | carried forward as declared | scoped the sampling that produced the verdict |
 | `condition` | doesn't exist | optional | the region the evidence actually covered, which may be narrower than `domain` |
-| `tolerance` | required when relevant, no default | carried forward when present | so a verified record is self-contained |
+| `tolerance` | recommended when relevant, no spec default | carried forward when present | so a verified record is self-contained |
 | `meta` | optional | carried forward unchanged | opaque extension point, see below |
 | `intent` | proposed, pre-check | documented, from the docstring when one exists | see "Where `intent` comes from" below |
 | `signature` | free-text, human-written, not verified | from the tool's own introspection | |
@@ -284,7 +284,6 @@ conflict by preferring whichever version it happened to read last is
 choosing silently on the author's behalf, which is the outcome this rule
 exists to prevent.
 
-- Singular string fields, like `intent` don't merge the way a claim list does, but are concatentated to allow different files to document different intents about the function if this pattern is so desired.
 - `grammar` applied at function level applies to all claims define below it until another `grammar` key is detected, this allows for mixing of different claim grammars within the same declared function yaml. 
 
 ## Claim membership is append-only

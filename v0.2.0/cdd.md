@@ -225,9 +225,10 @@ Every term used across this repo, linked from here.
   [declared-schema.md, "Tolerance has no
   default"](declared-schema.md#tolerance-has-no-default-and-is-left-to-the-implementation).
 - **evidence route**: how a claim gets checked, `probe` and `derive` are the
-  two well-known routes, open to others. [`claim-anatomy.md`](claim-anatomy.md);
-  [declared-schema.md, "Route defaults to
-  `probe`"](declared-schema.md#route-defaults-to-probe).
+  two well-known routes, open to others; unstated leaves the choice to
+  the tool, strongest-first in the reference behaviour.
+  [`claim-anatomy.md`](claim-anatomy.md); [declared-schema.md, "Route is
+  advice"](declared-schema.md#route-is-advice-an-unstated-route-leaves-the-choice-to-the-tool).
 - **verdict**: the outcome of checking a claim: `proven`, `holds`,
   `documented`, `declared`, `unknown`, `falsified`, `invalidated`,
   `skipped`. [`evidence-ladder.md`](evidence-ladder.md).

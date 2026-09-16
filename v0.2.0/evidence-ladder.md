@@ -124,25 +124,33 @@ Two things worth emphasising:
 
 ## Strict vs lenient checking
 
-Some verdicts depend on the nature of the problem and the stance the checking tool itself takes, not on
-anything about the claim: whether a `skipped` claim counts as merely
-unverifiable or as an outright falsification. This shows up wherever "the code
-silently accepted something it probably shouldn't have". For example,
-domain-enforcement claims (see `claim-anatomy.md`, "Domain: declared vs
-enforced") offers a clear example: the function receives input outside of it's declared domain, `holds` means out-of-domain input was actually rejected as desired, but a silent acceptance is `skipped`,
-in lenient mode, and `falsified` in strict mode.
+A verdict is fixed by the evidence, and never depends on who is
+asking: strict and lenient are a **reporting posture over
+already-computed verdicts, not an adjudication mode**. What the
+posture decides is whether a claim that could not be verified fails
+the run.
+
+The classic case is "the code silently accepted something it probably
+shouldn't have". A domain-enforcement claim (see `claim-anatomy.md`,
+"Domain: declared vs enforced") on a function that receives input
+outside its declared domain reads `holds` when out-of-domain input was
+actually rejected, and a silent acceptance earns whatever verdict the
+evidence supports, identically in both modes. The modes differ only in
+what happens next: lenient proceeds past a `skipped` or unverifiable
+claim, reporting it; strict fails the run on it.
 
 Which mode is active is a setting the caller of a checking tool controls,
 not a property of the claim or the record; the same claim set can be
 checked leniently during development and strictly in CI.
 
-Lenient treats skipped as a verified claim, strict treats it as falsified.
-
-`unknown` follows the same rule as `skipped`: lenient proceeds, strict
-refuses. `invalidated` does **not**: it is a regression from a verdict
-this claim previously had, so it fails in both modes. A tool that let a
-regression through leniently would be hiding exactly the transition the
-verdict exists to surface.
+`unknown` is stricter than `skipped`, deliberately: it fails in
+**every** mode until a human explicitly accepts the gap, because a
+claim nobody could adjudicate is indistinguishable from one that would
+have failed. What lenient honours is the recorded acceptance, never
+the silence. `invalidated` fails in both modes with no acceptance
+path at all: it is a regression from a verdict this claim previously
+had, and a tool that let it through leniently would be hiding exactly
+the transition the verdict exists to surface.
 
 For critical code, the expected behaviour should be strict checking for the following reason: if a claim cannot be verified, choosing to accept it anyway becomes an explicit decision point. The person making that decision may have valid reasons based on information or reasoning outside the scope of the code, but the decision to proceed despite an unverified (i.e. falsified) claim should be deliberate rather than implicit.
 

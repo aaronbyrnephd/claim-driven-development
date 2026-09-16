@@ -44,9 +44,9 @@ Fields per claim:
 |---|---|---|
 | `name` | yes | short identifier, unique within the function's claim set |
 | `statement` | yes | the equation or inequality, over `f` and the function's parameters, written in whatever expression grammar `grammar` names |
-| `route` | no, default `probe` | how the claim gets checked when unstated; see "Route defaults to `probe`" below and `record-schema.md`, "Open for extension" |
+| `route` | no | how the claim gets checked; unstated leaves the choice to the tool, strongest-first in the reference behaviour, see "Route is advice" below and `record-schema.md`, "Open for extension" |
 | `domain` | no, default `(-inf, inf)` | per-parameter bounds this claim is asserted over, including the quantifier it's asserted under; see "Domain is a claim field" below |
-| `tolerance` | required when `statement` does a near-equality float comparison | how close counts as equal; no spec-level default, see "Tolerance has no default, and is left to the implementation" below |
+| `tolerance` | no, recommended when `statement` does a near-equality float comparison | how close counts as equal; no spec-level default, see "Tolerance has no default, and is left to the implementation" below |
 | `premise` | no | what the claim assumes, when it is true only under a side condition; see "Premises" below and `claim-anatomy.md` |
 | `dependencies` | no | what this claim requires to hold first; see "Claim dependencies" below |
 | `authored` | no | what the author knows about the claim's origin (`by`, `at`, `ref`), merged forward by the checking tool; see below |
@@ -182,7 +182,7 @@ relative plus `1e-8` absolute); Haskell has no dominant convention at all;
 COBOL's native decimal types mostly don't have this problem in the first
 place.
 
-So this spec sets none. `tolerance` is required whenever a claim's
+So this spec sets none. `tolerance` is recommended whenever a claim's
 `statement` does a near-equality comparison sensitive to floating-point
 rounding, and absent otherwise; how close counts as equal genuinely
 depends on the problem's own required accuracy, not on anything this spec
@@ -193,15 +193,19 @@ necessarily need, but that default is the tool's own convention to
 document, not this spec's, and `tolerance` on an individual claim should
 always override it.
 
-### Route defaults to `probe`
+### Route is advice; an unstated route leaves the choice to the tool
 
 Unlike `grammar`, which has no default because guessing the wrong dialect
-breaks parsing outright, `route` defaults to `probe` when a claim doesn't
-state one. `probe`, some form of live sampling against the real function,
-is close to a universal capability: nearly any tool can do it, where no
-comparably universal default exists for `grammar`. This is the same default
-a property-based testing tool makes when no strategy is given: generate
-inputs and check, unless told otherwise.
+breaks parsing outright, a claim that states no `route` leaves the
+choice of evidence to the tool. The reference behaviour is to try the
+strongest evidence available and fall back: derive where the function
+lifts to a symbolic form, probe otherwise. `probe`, some form of live
+sampling against the real function, is the floor: close to a universal
+capability, nearly any tool can do it, so a tool with nothing stronger
+lands there, the same default a property-based testing tool makes when
+no strategy is given. Either way the recorded `route` names what
+actually decided, never the instruction (see `record-schema.md`,
+"Subtypes: the colon convention").
 
 `claim-anatomy.md`'s claim families (symmetry, order, and so on) are a way
 of thinking about what to check, not a field in this shape: this schema
