@@ -168,8 +168,10 @@ its choices.
 
 ## License
 
-The documents in this repo are CC-BY-4.0: reuse and adapt freely, with
-attribution. That's deliberately a different kind of license from whatever
-an implementation might use for its code (a software license like MIT or
-Apache-2.0); the spec for CDD is meant to be able to
-move independently from any implementations.
+The documents in this repo are CC BY-SA 4.0: reuse and adapt freely,
+with attribution, and a derivative of the specification stays open
+under the same terms. That's deliberately a different kind of license
+from whatever an implementation might use for its code (a software
+license, or a source-available one); the spec for CDD is meant to be
+able to move independently from any implementations, and ShareAlike is
+what keeps a fork of the spec itself from being closed.
