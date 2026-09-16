@@ -4,15 +4,12 @@ Versioned independently of any implementation. A record's
 `lineage.CDD_spec_version` field states which version it conforms to.
 (v0.1.0 spelled this `lineage.spec_version`; see the 0.2.0 entry.)
 
-## 0.2.0 (unreleased, draft)
+## 0.2.0 (2026-09-16)
 
 Drafted from experience implementing v0.1.0. The largest change is one of
 scope: v0.2 states the method and pins only a small normative core,
 leaving the rest to implementations. Nothing from v0.1.0 is removed or
 repointed; several things it required become recommended instead.
-
-`v0.2/DECISIONS.md` lists the few questions the draft still leaves
-open, and is deleted before release.
 
 **Scope**
 

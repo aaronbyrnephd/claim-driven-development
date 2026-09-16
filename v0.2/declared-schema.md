@@ -1,6 +1,6 @@
 # Declared shape
 
-Status: v0.2.0-draft. Part of the record schema; see `record-schema.md` for how
+Status: v0.2.0. Part of the record schema; see `record-schema.md` for how
 this relates to the verified shape.
 
 One or more claims about one function, keyed by dotted name

@@ -1,6 +1,6 @@
 # Claim anatomy
 
-Status: v0.2.0-draft.
+Status: v0.2.0.
 
 A claim about a function `f : A → B` is a four-part structure, optionally
 carrying a premise, and an adjudication lifecycle status:

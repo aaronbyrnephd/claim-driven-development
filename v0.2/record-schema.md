@@ -1,6 +1,6 @@
 # Record schema
 
-Status: v0.2.0-draft. The shape splits into two files,
+Status: v0.2.0. The shape splits into two files,
 [`declared-schema.md`](declared-schema.md) (how a claim set is proposed)
 and [`verified-schema.md`](verified-schema.md) (what a conformant tool
 writes after checking one). This document covers what's true of both, or

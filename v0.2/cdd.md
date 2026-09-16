@@ -1,6 +1,6 @@
 # Claim-Driven Development (CDD)
 
-Status: v0.2.0-draft.
+Status: v0.2.0.
 
 Claim-driven development is a workflow for coding that is primarily written by AI models and reviewed by humans at the critical failure points rather than
 reviewed line by line. 

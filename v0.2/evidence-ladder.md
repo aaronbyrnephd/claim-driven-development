@@ -1,6 +1,6 @@
 # Evidence ladder
 
-Status: v0.2.0-draft.
+Status: v0.2.0.
 
 Every claim's adjudicated verdict is bound to a specific kind of evidence, and the
 verdict states which kind, so a reader of the knowledge base never has to guess how hard a
