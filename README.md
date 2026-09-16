@@ -166,6 +166,14 @@ The first tool (in development) against this spec is **mathema**, a downstream p
 project. Nothing in this spec depends on it or assumes
 its choices.
 
+## Contributing
+
+Contributions are welcome and go through an ordinary pull request. A
+first contribution asks you to accept the
+[Contributor Licence Agreement](CLA.md), the same document the
+reference implementation uses; it is a licence grant, not an
+assignment, and it never limits what you do with your own work.
+
 ## License
 
 The documents in this repo are CC BY-SA 4.0: reuse and adapt freely,
