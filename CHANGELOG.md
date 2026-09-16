@@ -6,6 +6,11 @@ Versioned independently of any implementation. A record's
 
 ## 0.2.0 (2026-09-16)
 
+The licence moves from CC BY 4.0 to **CC BY-SA 4.0**: a derivative of
+this specification stays open under the same terms. Copyright remains
+with Aaron Byrne personally. v0.1.0 was published under CC BY 4.0 and
+that grant is irrevocable for it.
+
 Drafted from experience implementing v0.1.0. The largest change is one of
 scope: v0.2 states the method and pins only a small normative core,
 leaving the rest to implementations. Nothing from v0.1.0 is removed or
